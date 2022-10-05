@@ -1,4 +1,5 @@
 import requests
+import json
 
 url = "https://weatherapi-com.p.rapidapi.com/current.json"
 
@@ -11,4 +12,5 @@ headers = {
 
 response = requests.request("GET", url, headers=headers, params=querystring)
 
-print(response.text)
+json_obj = json.loads(response.text)
+print("Temperatura atual é de {}, e a sensação térmica é de {}.".format(json_obj['current']['temp_c'],json_obj['current']['feelslike_c']))

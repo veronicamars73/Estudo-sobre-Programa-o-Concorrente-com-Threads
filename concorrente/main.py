@@ -1,14 +1,18 @@
 
+import json
 from threading import Thread
 import requests
 import time
 import pandas as pd
 
-from custom_thread import CustomThread
 
-def run_thread(url):
+def run_thread(url,headers,querystring):
     inicial = time.time()
+    test = True
     response = requests.request("GET", url, headers=headers, params=querystring)
+    time.sleep(.07)
+    json_obj = json.loads(response.text)
+    print("Temperatura atual é de {}ºC e a sensação térmica é de {}ºC.".format(json_obj['current']['temp_c'],json_obj['current']['feelslike_c']))
     final = time.time()
     return final-inicial
 
@@ -22,7 +26,7 @@ headers = {
         'User-agent': 'Mozilla/5.0'
     }
 
-cenarios = [10, 50, 100, 200, 500, 1000, 5000, 10000, 25000]
+cenarios = [10, 50, 100, 200, 500, 1000, 5000]
 
 dados = {'num_execucao':[], 'n':[], 'tempo':[]}
 
@@ -32,7 +36,7 @@ for c in cenarios:
         thread = []
         inicial = time.time()
         for i in range(N):
-            thread.append(Thread(args=(url,headers,querystring)))
+            thread.append(Thread(target=run_thread,args=(url,headers,querystring)))
             thread[-1].start()
         for t in thread:
             t.join()
